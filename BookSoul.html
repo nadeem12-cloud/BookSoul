@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BookSoul</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    /* [ALL YOUR EXISTING CSS - KEEPING IT EXACTLY THE SAME] */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --ink: #1a1209;
+      --ink2: #3d2f1f;
+      --ink3: #6b5744;
+      --ink4: #9c8472;
+      --cream: #faf6ef;
+      --cream2: #f3ece0;
+      --cream3: #e8ddd0;
+      --cream4: #d4c5b0;
+      --accent: #8b3a0f;
+      --accent2: #c0541a;
+      --accent3: #e8834a;
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --teal: #1a5c5c;
+      --teal2: #2d8080;
+      --border: #d4c5b0;
+      --border2: #b8a898;
+      --r: 4px;
+      --r2: 8px;
+      --serif: 'Playfair Display', Georgia, serif;
+      --body: 'Source Serif 4', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    .masthead {
+      background: var(--ink);
+      color: var(--cream);
+      text-align: center;
+      padding: 18px 32px 14px;
+      border-bottom: 3px double var(--gold)
+    }
+
+    .masthead-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px
+    }
+
+    .api-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--sans);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.15);
+      color: var(--cream4);
+      animation: fadeIn .4s ease;
+      transition: all .4s
+    }
+
+    .api-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+      transition: background .4s
+    }
+
+    .api-status-pill.online .api-status-dot { background: #10b981 }
+    .api-status-pill.offline .api-status-dot { background: #ef4444 }
+
+    .api-loading-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink4);
+      padding: 16px;
+    }
+
+    .masthead-date {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--cream4);
+      letter-spacing: .5px
+    }
+
+    .masthead-title {
+      font-family: var(--serif);
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      line-height: 1;
+      color: var(--cream)
+    }
+
+    .masthead-sub {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--gold2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 4px
+    }
+
+    .masthead-rule {
+      height: 1px;
+      background: var(--ink3);
+      margin: 10px 0 0
+    }
+
+    .nav-strip {
+      background: var(--cream2);
+      border-bottom: 2px solid var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100
+    }
+
+    .nav-tab {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 22px;
+      border: none;
+      background: transparent;
+      color: var(--ink3);
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: all .2s;
+      position: relative
+    }
+
+    .nav-tab:first-child {
+      border-left: 1px solid var(--border)
+    }
+
+    .nav-tab:hover {
+      background: var(--cream3);
+      color: var(--ink)
+    }
+
+    .nav-tab.active {
+      background: var(--ink);
+      color: var(--cream);
+      font-weight: 500
+    }
+
+    .nav-tab .tab-count {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-left: 5px;
+      vertical-align: middle
+    }
+
+    .page {
+      display: none;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      animation: fadeIn .25s ease
+    }
+
+    .page.active {
+      display: block
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .headline {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 8px
+    }
+
+    .deck {
+      font-family: var(--body);
+      font-size: 16px;
+      font-style: italic;
+      color: var(--ink3);
+      line-height: 1.6;
+      margin-bottom: 20px
+    }
+
+    .section-rule {
+      border: none;
+      border-top: 2px solid var(--ink);
+      margin: 0 0 20px;
+      position: relative
+    }
+
+    .section-rule::after {
+      content: attr(data-label);
+      position: absolute;
+      top: -10px;
+      left: 0;
+      background: var(--cream);
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding-right: 10px;
+      font-weight: 500
+    }
+
+    .pull-quote {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.4;
+      border-left: 4px solid var(--accent);
+      padding: 12px 20px;
+      margin: 20px 0;
+      background: var(--cream2)
+    }
+
+    .byline {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink4);
+      margin-bottom: 16px
+    }
+
+    .btn {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all .2s;
+      border: 1.5px solid var(--ink);
+      background: transparent;
+      color: var(--ink);
+      letter-spacing: .3px
+    }
+
+    .btn:hover {
+      background: var(--ink);
+      color: var(--cream)
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff
+    }
+
+    .btn-accent:hover {
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color: #fff
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px
+    }
+
+    .btn-ghost {
+      border-color: var(--border2);
+      color: var(--ink3)
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--cream)
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 24px
+    }
+
+    .card-cream {
+      background: var(--cream2);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 20px
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px
+    }
+
+    .book-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      overflow: hidden;
+      transition: all .25s;
+      cursor: default;
+      display: flex;
+      flex-direction: column
+    }
+
+    .book-card:hover {
+      border-color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink)
+    }
+
+    .book-cover {
+      height: 185px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0
+    }
+
+    .book-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .3s ease
+    }
+
+    .book-card:hover .book-cover img {
+      transform: scale(1.04)
+    }
+
+    .book-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      text-align: center;
+      gap: 6px
+    }
+
+    .book-cover-placeholder .ph-icon {
+      font-size: 28px;
+      opacity: .6
+    }
+
+    .book-cover-placeholder .ph-title {
+      font-family: var(--serif);
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .9);
+      line-height: 1.3;
+      max-height: 3em;
+      overflow: hidden
+    }
+
+    .book-cover-placeholder .ph-author {
+      font-family: var(--sans);
+      font-size: 10px;
+      color: rgba(255, 255, 255, .65);
+      margin-top: 2px
+    }
+
+    .book-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .book-title {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3
+    }
+
+    .book-author {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink3);
+      letter-spacing: .3px
+    }
+
+    .book-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--cream3)
+    }
+
+    .genre-pill {
+      font-family: var(--sans);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      font-weight: 500
+    }
+
+    .stars-display {
+      font-size: 13px;
+      color: var(--gold)
+    }
+
+    .search-container {
+      position: relative;
+      margin-bottom: 28px
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      font-family: var(--body);
+      font-size: 16px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: var(--r);
+      color: var(--ink);
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .search-bar:focus {
+      border-color: var(--accent)
+    }
+
+    .search-bar::placeholder {
+      color: var(--ink4);
+      font-style: italic
+    }
+
+    .search-icon-wrap {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      pointer-events: none
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: var(--r);
+      z-index: 200;
+      max-height: 380px;
+      overflow-y: auto;
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, .1)
+    }
+
+    .ac-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--cream3);
+      transition: background .15s
+    }
+
+    .ac-item:last-child {
+      border-bottom: none
+    }
+
+    .ac-item:hover,
+    .ac-item.selected {
+      background: var(--cream2)
+    }
+
+    .ac-thumb {
+      width: 40px;
+      min-width: 40px;
+      height: 56px;
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--cream3)
+    }
+
+    .ac-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .ac-thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px
+    }
+
+    .ac-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .ac-title {
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ac-author {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink3)
+    }
+
+    .ac-right {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .ac-genre {
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--ink4)
+    }
+
+    .ac-rating {
+      font-size: 12px;
+      color: var(--gold)
+    }
+
+    .ac-add-btn {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      border-radius: var(--r);
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s
+    }
+
+    .ac-add-btn:hover {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .search-hint {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink4);
+      margin-top: 8px;
+      text-align: center
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+      align-items: center
+    }
+
+    .filter-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-right: 4px
+    }
+
+    .chip {
+      font-family: var(--sans);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--ink3);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .chip:hover {
+      border-color: var(--ink);
+      color: var(--ink)
+    }
+
+    .chip.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--cream);
+      font-weight: 500
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      overflow: hidden;
+      margin-bottom: 28px
+    }
+
+    .metric-cell {
+      background: var(--cream2);
+      padding: 18px;
+      text-align: center
+    }
+
+    .metric-val {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1
+    }
+
+    .metric-label {
+      font-family: var(--sans);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ink4);
+      margin-top: 4px
+    }
+
+    .trait-item {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--cream3)
+    }
+
+    .trait-item:last-child {
+      border-bottom: none
+    }
+
+    .trait-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px
+    }
+
+    .trait-name {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink)
+    }
+
+    .trait-pct {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent)
+    }
+
+    .trait-bar-bg {
+      height: 6px;
+      background: var(--cream3);
+      border-radius: 3px
+    }
+
+    .trait-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .trait-desc {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink4);
+      margin-top: 5px;
+      font-style: italic
+    }
+
+    .rec-section-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--ink);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px
+    }
+
+    .rec-section-title span {
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink4);
+      font-weight: 400
+    }
+
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px
+    }
+
+    .rec-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      overflow: hidden;
+      transition: all .2s;
+      display: flex;
+      flex-direction: column
+    }
+
+    .rec-card:hover {
+      border-color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink)
+    }
+
+    .rec-card-cover {
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0
+    }
+
+    .rec-card-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .3s
+    }
+
+    .rec-card:hover .rec-card-cover img {
+      transform: scale(1.04)
+    }
+
+    .rec-card-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      text-align: center;
+      gap: 4px
+    }
+
+    .rec-card-cover-placeholder .ph-title {
+      font-family: var(--serif);
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .9);
+      line-height: 1.3
+    }
+
+    .rec-card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column
+    }
+
+    .rec-card-title {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 3px
+    }
+
+    .rec-card-author {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink3);
+      margin-bottom: 10px
+    }
+
+    .rec-card-reason {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink3);
+      background: var(--cream2);
+      border-left: 3px solid var(--accent);
+      padding: 8px 10px;
+      border-radius: 0 var(--r) var(--r) 0;
+      margin-top: auto;
+      line-height: 1.5
+    }
+
+    .rec-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--cream3)
+    }
+
+    .evo-chart-wrap {
+      position: relative;
+      height: 280px
+    }
+
+    .insight-box {
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      background: var(--cream2);
+      font-family: var(--body);
+      font-size: 14px;
+      color: var(--ink2);
+      line-height: 1.7;
+      border-left: 4px solid var(--accent)
+    }
+
+    .archetype-banner {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 28px 32px;
+      border-radius: var(--r2);
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px
+    }
+
+    .archetype-emoji {
+      font-size: 48px;
+      line-height: 1
+    }
+
+    .archetype-name {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gold2)
+    }
+
+    .archetype-desc {
+      font-family: var(--body);
+      font-size: 14px;
+      font-style: italic;
+      color: var(--cream4);
+      margin-top: 4px
+    }
+
+    .archetype-traits {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap
+    }
+
+    .archetype-trait-tag {
+      font-family: var(--sans);
+      font-size: 11px;
+      padding: 3px 10px;
+      border: 1px solid var(--gold);
+      color: var(--gold2);
+      border-radius: 2px;
+      letter-spacing: .5px
+    }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 18, 9, .7);
+      z-index: 300;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-bg.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--cream);
+      border: 2px solid var(--ink);
+      border-radius: var(--r2);
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, .2)
+    }
+
+    .modal-title {
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .modal-sub {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink3);
+      margin-bottom: 24px;
+      letter-spacing: .3px
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--ink3);
+      padding: 4px 8px;
+      border-radius: var(--r)
+    }
+
+    .modal-close:hover {
+      background: var(--cream3)
+    }
+
+    .modal {
+      position: relative
+    }
+
+    .drawer-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 18, 9, .5);
+      z-index: 600;
+      opacity: 0;
+      transition: opacity .3s
+    }
+
+    .drawer-bg.open {
+      display: block;
+      opacity: 1
+    }
+
+    .drawer {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 440px;
+      background: var(--cream);
+      box-shadow: -4px 0 24px rgba(0, 0, 0, .15);
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.16, 1, .3, 1);
+      overflow-y: auto;
+      padding: 40px 32px;
+      border-left: 2px solid var(--ink)
+    }
+
+    .drawer-bg.open .drawer {
+      transform: translateX(0)
+    }
+
+    .drawer-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--ink3);
+      padding: 4px 8px;
+      border-radius: var(--r)
+    }
+
+    .drawer-close:hover {
+      background: var(--cream3);
+      color: var(--ink)
+    }
+
+    .book-preview {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 16px;
+      margin-top: 16px;
+      display: none;
+      align-items: center;
+      gap: 14px
+    }
+
+    .shelf-tab {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink4);
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -1px
+    }
+
+    .shelf-tab:hover {
+      color: var(--ink)
+    }
+
+    .shelf-tab.active {
+      color: var(--ink);
+      border-bottom-color: var(--ink)
+    }
+
+    .book-preview.show {
+      display: flex
+    }
+
+    .preview-spine {
+      width: 8px;
+      min-width: 8px;
+      height: 60px;
+      border-radius: 3px
+    }
+
+    .preview-info {
+      flex: 1
+    }
+
+    .preview-title {
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .preview-author {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink3);
+      margin-top: 2px
+    }
+
+    .preview-meta {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--gold);
+      margin-top: 4px
+    }
+
+    .star-row {
+      display: flex;
+      gap: 6px;
+      margin: 12px 0
+    }
+
+    .star-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--cream3);
+      transition: color .15s;
+      padding: 2px
+    }
+
+    .star-btn.on {
+      color: var(--gold)
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: var(--cream);
+      border-left: 4px solid var(--gold);
+      border-radius: var(--r);
+      padding: 14px 20px;
+      font-family: var(--sans);
+      font-size: 13px;
+      z-index: 400;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .3s;
+      max-width: 300px
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 12px
+    }
+
+    .empty-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px
+    }
+
+    .empty-sub {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--ink4)
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(250, 246, 239, .95);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--cream3);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .loading-text {
+      font-family: var(--serif);
+      font-size: 18px;
+      color: var(--ink)
+    }
+
+    .flex {
+      display: flex
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .gap-8 {
+      gap: 8px
+    }
+
+    .gap-12 {
+      gap: 12px
+    }
+
+    .gap-16 {
+      gap: 16px
+    }
+
+    .gap-20 {
+      gap: 20px
+    }
+
+    .mt-8 {
+      margin-top: 8px
+    }
+
+    .mt-12 {
+      margin-top: 12px
+    }
+
+    .mt-16 {
+      margin-top: 16px
+    }
+
+    .mt-20 {
+      margin-top: 20px
+    }
+
+    .mt-24 {
+      margin-top: 24px
+    }
+
+    .mt-28 {
+      margin-top: 28px
+    }
+
+    .mb-8 {
+      margin-bottom: 8px
+    }
+
+    .mb-12 {
+      margin-bottom: 12px
+    }
+
+    .mb-16 {
+      margin-bottom: 16px
+    }
+
+    .mb-20 {
+      margin-bottom: 20px
+    }
+
+    .mb-24 {
+      margin-bottom: 24px
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--cream2)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--cream4);
+      border-radius: 3px
+    }
+
+    @media(max-width:768px) {
+      .masthead-title {
+        font-size: 28px
+      }
+
+      .metric-row {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr
+      }
+
+      .nav-tab {
+        padding: 10px 12px;
+        font-size: 11px
+      }
+
+      .archetype-banner {
+        flex-direction: column;
+        text-align: center
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading book catalog...</div>
+  </div>
+
+  <!-- [ALL YOUR EXISTING HTML - KEEPING IT EXACTLY THE SAME] -->
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="masthead-date" id="today-date"></span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="masthead-date">Vol. I · Est. 2024</span>
+        <span class="api-status-pill" id="api-status-pill">
+          <span class="api-status-dot" id="api-status-dot"></span>
+          <span id="api-status-text">ML Engine</span>
+        </span>
+      </div>
+    </div>
+    <div class="masthead-title">BookSoul</div>
+    <div class="masthead-sub">Your Literary Identity, Illuminated</div>
+    <div class="masthead-rule"></div>
+  </header>
+
+  <nav class="nav-strip">
+    <button class="nav-tab active" onclick="showPage('library')">Library <span class="tab-count"
+        id="lib-count">0</span></button>
+    <button class="nav-tab" onclick="showPage('personality')">Personality</button>
+    <button class="nav-tab" onclick="showPage('recommendations')">Discover</button>
+    <button class="nav-tab" onclick="showPage('evolution')">Evolution</button>
+  </nav>
+
+  <div id="page-library" class="page active">
+    <div class="flex-between mb-20">
+      <div>
+        <h1 class="headline">My Reading Library</h1>
+        <p class="deck">Every book you've read leaves a mark on who you are.</p>
+      </div>
+      <button class="btn btn-accent" onclick="openModal()">+ Add Book</button>
+    </div>
+    <div class="metric-row" id="lib-metrics"></div>
+
+    <div style="display:flex; gap:16px; border-bottom:1px solid var(--cream3); margin-bottom:16px;">
+      <button class="shelf-tab active" id="tab-read" onclick="setShelf('read')">Read</button>
+      <button class="shelf-tab" id="tab-reading" onclick="setShelf('reading')">Currently Reading</button>
+      <button class="shelf-tab" id="tab-want" onclick="setShelf('want')">Want to Read</button>
+    </div>
+
+    <div class="flex-between gap-16" style="margin-bottom: 16px;">
+      <div class="search-container" style="max-width: 400px; margin-bottom: 0; flex: 1;">
+        <div class="search-icon-wrap"
+          style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;z-index:1;pointer-events:none">
+          🔍</div>
+        <input type="text" id="search-bar-lib" class="search-bar" style="padding-left:42px"
+          placeholder="Search your library..." oninput="renderLibrary()" autocomplete="off">
+      </div>
+      <div style="flex-shrink: 0">
+        <select id="sort-lib" onchange="renderLibrary()" class="search-bar"
+          style="padding: 12px 16px; width: auto; cursor: pointer; border-color: var(--border2); color: var(--ink3);">
+          <option value="added-desc">Date Added (Newest)</option>
+          <option value="added-asc">Date Added (Oldest)</option>
+          <option value="rating-desc">Rating (High to Low)</option>
+          <option value="rating-asc">Rating (Low to High)</option>
+          <option value="title-asc">Title (A to Z)</option>
+          <option value="author-asc">Author (A to Z)</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <div id="genre-chips"></div>
+    </div>
+    <div id="library-grid" class="book-grid"></div>
+  </div>
+
+  <div id="page-personality" class="page">
+    <h1 class="headline">Your Personality Profile</h1>
+    <p class="deck">Decoded from your reading patterns through the lens of Big Five psychology.</p>
+    <div id="p-empty" class="empty-state" style="display:none">
+      <span class="empty-icon">🧠</span>
+      <div class="empty-title">Your profile awaits</div>
+      <div class="empty-sub">Add at least 3 books to unlock your personality analysis</div>
+    </div>
+    <div id="p-content">
+      <div id="archetype-banner" class="archetype-banner"></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:18px">Big Five Traits</h3>
+          <div id="trait-bars"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:18px">Radar View</h3>
+          <div style="position:relative;height:300px"><canvas id="radarChart" role="img"
+              aria-label="Big Five radar chart"></canvas></div>
+        </div>
+      </div>
+      <div class="card mt-20">
+        <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:16px">The Editorial: What Your
+          Books Say About You</h3>
+        <div id="p-insights"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-recommendations" class="page">
+    <div class="flex-between mb-20">
+      <div>
+        <h1 class="headline">Curated For You</h1>
+        <p class="deck">Three editorial lenses. One perfect next read.</p>
+      </div>
+      <button class="btn" onclick="generateRecs()">↻ Refresh</button>
+    </div>
+    <div id="rec-empty" class="empty-state" style="display:none">
+      <span class="empty-icon">✨</span>
+      <div class="empty-title">Add books to unlock recommendations</div>
+      <div class="empty-sub">We need at least 2 books to tailor suggestions</div>
+    </div>
+    <div id="rec-content"></div>
+  </div>
+
+  <div id="page-evolution" class="page">
+    <h1 class="headline">Your Literary Evolution</h1>
+    <p class="deck">How reading has shaped and reshaped your personality over time.</p>
+    <div id="evo-empty" class="empty-state" style="display:none">
+      <span class="empty-icon">📈</span>
+      <div class="empty-title">Start your journey</div>
+      <div class="empty-sub">Add books from different years to track your evolution</div>
+    </div>
+    <div id="evo-content">
+      <div class="card mb-24">
+        <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:6px">Trait Evolution</h3>
+        <p style="font-family:var(--sans);font-size:12px;color:var(--ink4);margin-bottom:18px">Cumulative personality
+          shift as your library grew</p>
+        <div class="evo-chart-wrap"><canvas id="evoChart" role="img" aria-label="Trait evolution line chart"></canvas>
+        </div>
+        <div id="evo-legend" class="mt-16" style="display:flex;flex-wrap:wrap;gap:12px"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:16px">Reading Stats</h3>
+          <div id="evo-stats"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:12px">Genre Distribution</h3>
+          <div style="position:relative;height:200px"><canvas id="genreChart" role="img"
+              aria-label="Genre distribution donut chart"></canvas></div>
+          <div id="genre-legend" class="mt-12" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-title">Add a Book</div>
+      <div class="modal-sub" id="modal-sub-text">Search our catalog — type to find your book instantly</div>
+      <div style="position:relative">
+        <div class="search-icon-wrap"
+          style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;z-index:1;pointer-events:none">
+          🔍</div>
+        <input type="text" id="modal-search" class="search-bar" style="padding-left:42px"
+          placeholder="Search by title or author..." oninput="handleModalSearch()" onkeydown="handleModalKey(event)"
+          autocomplete="off">
+        <div class="autocomplete-dropdown" id="modal-dropdown" style="display:none"></div>
+      </div>
+      <div class="search-hint">Try searching for your favorite author or genre...</div>
+      <div class="book-preview" id="book-preview">
+        <div class="preview-spine" id="preview-spine"></div>
+        <div class="preview-info">
+          <div class="preview-title" id="preview-title"></div>
+          <div class="preview-author" id="preview-author"></div>
+          <div class="preview-meta" id="preview-meta"></div>
+        </div>
+      </div>
+      <div id="rating-section" style="display:none;margin-top:16px">
+        <div style="font-family:var(--sans);font-size:13px;color:var(--ink3);margin-bottom:4px">Reading Status</div>
+        <select id="modal-status"
+          onchange="document.getElementById('modal-rating-fields').style.display=this.value==='read'?'block':'none'"
+          style="width:100%;margin-bottom:16px;padding:10px 12px;font-family:var(--sans);font-size:14px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--ink);cursor:pointer">
+          <option value="read">Read</option>
+          <option value="reading">Currently Reading</option>
+          <option value="want">Want to Read</option>
+        </select>
+        <div id="modal-rating-fields">
+          <div style="font-family:var(--sans);font-size:13px;color:var(--ink3);margin-bottom:4px">Your rating</div>
+          <div class="star-row" id="modal-stars">
+            <button class="star-btn" onclick="setRating(1)">★</button>
+            <button class="star-btn" onclick="setRating(2)">★</button>
+            <button class="star-btn" onclick="setRating(3)">★</button>
+            <button class="star-btn" onclick="setRating(4)">★</button>
+            <button class="star-btn" onclick="setRating(5)">★</button>
+          </div>
+          <div style="margin-top:8px">
+            <label style="font-family:var(--sans);font-size:12px;color:var(--ink3);display:block;margin-bottom:4px">Year
+              read</label>
+            <input type="number" id="modal-year" value="2024" min="1900" max="2025"
+              style="width:120px;padding:8px 12px;font-family:var(--sans);font-size:14px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;color:var(--ink);outline:none">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-accent" id="modal-add-btn" onclick="confirmAdd()" style="display:none">Add to
+          Library</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="drawer-bg" id="drawer-bg" onclick="closeDrawer(event)">
+    <div class="drawer" id="drawer" onclick="event.stopPropagation()">
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      <div id="drawer-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════
+    // BACKEND API CONFIG
+    // ══════════════════════════════════════════════
+    const API_BASE = 'http://127.0.0.1:8000';
+    let backendOnline = false;
+
+    async function checkBackend() {
+      try {
+        const r = await fetch(API_BASE + '/api/search?q=test', { signal: AbortSignal.timeout(3000) });
+        backendOnline = r.ok;
+      } catch { backendOnline = false; }
+      const pill = document.getElementById('api-status-pill');
+      const text = document.getElementById('api-status-text');
+      pill.className = 'api-status-pill ' + (backendOnline ? 'online' : 'offline');
+      text.textContent = backendOnline ? 'ML Engine Online' : 'ML Engine Offline';
+      return backendOnline;
+    }
+
+    // ══════════════════════════════════════════════
+    // CATALOG - LOADED FROM JSON (local fallback)
+    // ══════════════════════════════════════════════
+    let CATALOG = [];  // Will be populated from merged.json
+
+    // ── Tier 1: Specific title overrides ─────────────────────────────────────
+    const TITLE_OVERRIDES = {
+      'the stranger': 'Philosophy', 'the outsider': 'Philosophy', 'the plague': 'Philosophy',
+      'the myth of sisyphus': 'Philosophy', 'being and nothingness': 'Philosophy',
+      'nausea': 'Philosophy', 'no exit': 'Philosophy', 'the fall': 'Philosophy',
+      'thus spoke zarathustra': 'Philosophy', 'beyond good and evil': 'Philosophy',
+      'the republic': 'Philosophy', 'apology': 'Philosophy', 'nicomachean ethics': 'Philosophy',
+      'meditations': 'Philosophy', 'the prince': 'Philosophy', 'leviathan': 'Philosophy',
+      'critique of pure reason': 'Philosophy', 'the art of war': 'Philosophy',
+      'a brief history of time': 'Science', 'the selfish gene': 'Science',
+      'cosmos': 'Science', 'pale blue dot': 'Science', 'the grand design': 'Science',
+      'surely youre joking mr feynman': 'Science', 'the double helix': 'Science',
+      'sapiens': 'History', 'homo deus': 'Science Fiction', '21 lessons for the 21st century': 'History',
+      'guns germs and steel': 'History', 'the guns of august': 'History',
+      'a peoples history of the united states': 'History',
+      'the kite runner': 'Literary Fiction', 'a thousand splendid suns': 'Literary Fiction',
+      'one hundred years of solitude': 'Literary Fiction', 'love in the time of cholera': 'Literary Fiction',
+      'the alchemist': 'Spirituality', 'brida': 'Spirituality', 'veronika decides to die': 'Spirituality',
+      'the name of the rose': 'Mystery/Thriller', 'foucaults pendulum': 'Literary Fiction',
+      'dune': 'Science Fiction', 'dune messiah': 'Science Fiction', 'children of dune': 'Science Fiction',
+      'foundation': 'Science Fiction', 'i robot': 'Science Fiction', 'the caves of steel': 'Science Fiction',
+      'the lord of the rings': 'Fantasy', 'the hobbit': 'Fantasy', 'the silmarillion': 'Fantasy',
+      'a game of thrones': 'Fantasy', 'a clash of kings': 'Fantasy', 'a storm of swords': 'Fantasy',
+      'the way of kings': 'Fantasy', 'words of radiance': 'Fantasy',
+      'harry potter and the philosophers stone': 'Fantasy',
+      'harry potter and the chamber of secrets': 'Fantasy',
+      'harry potter and the prisoner of azkaban': 'Fantasy',
+      'harry potter and the goblet of fire': 'Fantasy',
+      'harry potter and the order of the phoenix': 'Fantasy',
+      'harry potter and the half-blood prince': 'Fantasy',
+      'harry potter and the deathly hallows': 'Fantasy',
+      'good omens': 'Fantasy', 'american gods': 'Fantasy', 'neverwhere': 'Fantasy',
+      'the hitchhikers guide to the galaxy': 'Science Fiction',
+      '1984': 'Science Fiction', 'animal farm': 'Science Fiction',
+      'brave new world': 'Science Fiction', 'fahrenheit 451': 'Science Fiction',
+      'the handmaids tale': 'Science Fiction', 'enders game': 'Science Fiction',
+      'neuromancer': 'Science Fiction', 'snow crash': 'Science Fiction',
+      'thinking fast and slow': 'Psychology', 'the undoing project': 'Psychology',
+      'influence': 'Psychology', 'quiet': 'Psychology', 'the power of habit': 'Self-Help',
+      'atomic habits': 'Self-Help', 'deep work': 'Self-Help', 'digital minimalism': 'Self-Help',
+      'the 7 habits of highly effective people': 'Self-Help',
+      'how to win friends and influence people': 'Self-Help',
+      'mans search for meaning': 'Psychology', 'the will to meaning': 'Psychology',
+      'rich dad poor dad': 'Business', 'the intelligent investor': 'Business',
+      'zero to one': 'Business', 'the lean startup': 'Business',
+      'good to great': 'Business', 'thinking in systems': 'Science',
+      'in cold blood': 'Biography', 'the immortal life of henrietta lacks': 'Biography',
+      'the diary of a young girl': 'Biography', 'long walk to freedom': 'Biography',
+      'the autobiography of malcolm x': 'Biography',
+      'into the wild': 'Travel', 'into thin air': 'Travel', 'eat pray love': 'Travel',
+      'the great gatsby': 'Literary Fiction', 'of mice and men': 'Literary Fiction',
+      'east of eden': 'Literary Fiction', 'the grapes of wrath': 'Literary Fiction',
+      'to kill a mockingbird': 'Literary Fiction', 'beloved': 'Literary Fiction',
+      'the sound and the fury': 'Literary Fiction', 'as i lay dying': 'Literary Fiction',
+      'ulysses': 'Literary Fiction', 'dubliners': 'Literary Fiction',
+      'mrs dalloway': 'Literary Fiction', 'to the lighthouse': 'Literary Fiction',
+      'lolita': 'Literary Fiction', 'pale fire': 'Literary Fiction',
+      'crime and punishment': 'Literary Fiction', 'the brothers karamazov': 'Literary Fiction',
+      'the idiot': 'Literary Fiction', 'notes from underground': 'Literary Fiction',
+      'war and peace': 'Literary Fiction', 'anna karenina': 'Literary Fiction',
+      'the metamorphosis': 'Literary Fiction', 'the trial': 'Literary Fiction',
+      'the castle': 'Literary Fiction', 'norwegian wood': 'Literary Fiction',
+      'kafka on the shore': 'Literary Fiction', 'the wind-up bird chronicle': 'Literary Fiction',
+      'never let me go': 'Literary Fiction', 'the remains of the day': 'Literary Fiction',
+      'midnight children': 'Literary Fiction', 'the god of small things': 'Literary Fiction',
+      'the white tiger': 'Literary Fiction', 'life of pi': 'Literary Fiction',
+      'on the road': 'Literary Fiction', 'the sun also rises': 'Literary Fiction',
+      'a farewell to arms': 'Literary Fiction', 'for whom the bell tolls': 'Literary Fiction',
+      'the old man and the sea': 'Literary Fiction',
+      'sherlock holmes': 'Mystery/Thriller', 'and then there were none': 'Mystery/Thriller',
+      'murder on the orient express': 'Mystery/Thriller', 'the girl with the dragon tattoo': 'Mystery/Thriller',
+      'gone girl': 'Mystery/Thriller', 'sharp objects': 'Mystery/Thriller',
+      'the shining': 'Horror', 'it': 'Horror', 'dracula': 'Horror', 'frankenstein': 'Horror',
+      'leaves of grass': 'Poetry', 'the waste land': 'Poetry', 'howl': 'Poetry',
+      'the divine comedy': 'Poetry', 'paradise lost': 'Poetry',
+      'the bhagavad gita': 'Spirituality', 'the tao te ching': 'Spirituality',
+      'siddhartha': 'Spirituality', 'the celestine prophecy': 'Spirituality',
+      'the power of now': 'Spirituality', 'a new earth': 'Spirituality',
+    };
+
+    // ── Tier 2: Author → Genre map for ~150 well-known authors ───────────────
+    const AUTHOR_GENRE_MAP = {
+      // Philosophy
+      'albert camus': 'Philosophy', 'jean-paul sartre': 'Philosophy', 'simone de beauvoir': 'Philosophy',
+      'friedrich nietzsche': 'Philosophy', 'immanuel kant': 'Philosophy', 'plato': 'Philosophy',
+      'aristotle': 'Philosophy', 'socrates': 'Philosophy', 'voltaire': 'Philosophy',
+      'bertrand russell': 'Philosophy', 'john locke': 'Philosophy', 'david hume': 'Philosophy',
+      'arthur schopenhauer': 'Philosophy', 'john stuart mill': 'Philosophy',
+      'rene descartes': 'Philosophy', 'george orwell': 'Science Fiction',
+      // Science Fiction
+      'isaac asimov': 'Science Fiction', 'philip k. dick': 'Science Fiction',
+      'arthur c. clarke': 'Science Fiction', 'ray bradbury': 'Science Fiction',
+      'h.g. wells': 'Science Fiction', 'frank herbert': 'Science Fiction',
+      'douglas adams': 'Science Fiction', 'orson scott card': 'Science Fiction',
+      'william gibson': 'Science Fiction', 'neal stephenson': 'Science Fiction',
+      'robert a. heinlein': 'Science Fiction', 'ursula k. le guin': 'Science Fiction',
+      'aldous huxley': 'Science Fiction', 'margaret atwood': 'Science Fiction',
+      // Fantasy
+      'j.r.r. tolkien': 'Fantasy', 'j. r. r. tolkien': 'Fantasy', 'tolkien': 'Fantasy',
+      'c.s. lewis': 'Fantasy', 'george r.r. martin': 'Fantasy', 'terry pratchett': 'Fantasy',
+      'neil gaiman': 'Fantasy', 'brandon sanderson': 'Fantasy', 'robin hobb': 'Fantasy',
+      'patrick rothfuss': 'Fantasy', 'robert jordan': 'Fantasy',
+      'j.k. rowling': 'Fantasy', 'michael moorcock': 'Fantasy', 'david eddings': 'Fantasy',
+      'terry goodkind': 'Fantasy', 'raymond e. feist': 'Fantasy', 'anne mccaffrey': 'Fantasy',
+      // Self-Help
+      'dale carnegie': 'Self-Help', 'stephen r. covey': 'Self-Help', 'tony robbins': 'Self-Help',
+      'tim ferriss': 'Self-Help', 'napoleon hill': 'Self-Help', 'james clear': 'Self-Help',
+      'mark manson': 'Self-Help', 'robert kiyosaki': 'Self-Help', 'david allen': 'Self-Help',
+      'cal newport': 'Self-Help', 'brene brown': 'Self-Help', 'mel robbins': 'Self-Help',
+      'simon sinek': 'Self-Help', 'gary vaynerchuk': 'Self-Help', 'ryan holiday': 'Self-Help',
+      // Psychology
+      'sigmund freud': 'Psychology', 'carl jung': 'Psychology', 'daniel kahneman': 'Psychology',
+      'steven pinker': 'Psychology', 'viktor frankl': 'Psychology', 'martin seligman': 'Psychology',
+      'malcolm gladwell': 'Psychology', 'robert cialdini': 'Psychology',
+      'philip zimbardo': 'Psychology', 'jordan b. peterson': 'Psychology',
+      'jordan peterson': 'Psychology', 'mihaly csikszentmihalyi': 'Psychology',
+      'oliver sacks': 'Psychology', 'antonio damasio': 'Psychology',
+      // History
+      'yuval noah harari': 'History', 'howard zinn': 'History', 'barbara tuchman': 'History',
+      'jared diamond': 'History', 'stephen ambrose': 'History', 'david mccullough': 'History',
+      'doris kearns goodwin': 'History', 'ron chernow': 'History',
+      'william manchester': 'History', 'antony beevor': 'History',
+      'eric hobsbawm': 'History', 'niall ferguson': 'History',
+      // Science
+      'stephen hawking': 'Science', 'carl sagan': 'Science', 'richard dawkins': 'Science',
+      'neil degrasse tyson': 'Science', 'brian greene': 'Science', 'michio kaku': 'Science',
+      'richard feynman': 'Science', 'james watson': 'Science',
+      'charles darwin': 'Science', 'e.o. wilson': 'Science', 'matt ridley': 'Science',
+      // Biography
+      'walter isaacson': 'Biography', 'robert caro': 'Biography',
+      'david grann': 'Biography', 'erik larson': 'Biography',
+      // Romance
+      'nicholas sparks': 'Romance', 'nora roberts': 'Romance', 'danielle steel': 'Romance',
+      'julia quinn': 'Romance', 'colleen hoover': 'Romance', 'diana gabaldon': 'Romance',
+      'lisa kleypas': 'Romance', 'emily henry': 'Romance', 'helen fielding': 'Romance',
+      'jojo moyes': 'Romance', 'sophie kinsella': 'Romance',
+      // Mystery / Thriller
+      'agatha christie': 'Mystery/Thriller', 'arthur conan doyle': 'Mystery/Thriller',
+      'james patterson': 'Mystery/Thriller', 'lee child': 'Mystery/Thriller',
+      'john grisham': 'Mystery/Thriller', 'gillian flynn': 'Mystery/Thriller',
+      'stieg larsson': 'Mystery/Thriller', 'tana french': 'Mystery/Thriller',
+      'michael connelly': 'Mystery/Thriller', 'dennis lehane': 'Mystery/Thriller',
+      'patricia cornwell': 'Mystery/Thriller', 'harlan coben': 'Mystery/Thriller',
+      'thomas harris': 'Mystery/Thriller', 'ian rankin': 'Mystery/Thriller',
+      'karin slaughter': 'Mystery/Thriller', 'jo nesbo': 'Mystery/Thriller',
+      'peter james': 'Mystery/Thriller', 'ruth rendell': 'Mystery/Thriller',
+      'sue grafton': 'Mystery/Thriller',
+      // Horror
+      'stephen king': 'Horror', 'dean koontz': 'Horror', 'shirley jackson': 'Horror',
+      'h.p. lovecraft': 'Horror', 'edgar allan poe': 'Horror', 'clive barker': 'Horror',
+      'peter straub': 'Horror', 'anne rice': 'Horror',
+      // Literary Fiction
+      'khaled hosseini': 'Literary Fiction', 'gabriel garcia marquez': 'Literary Fiction',
+      'gabriel garcía márquez': 'Literary Fiction', 'toni morrison': 'Literary Fiction',
+      'cormac mccarthy': 'Literary Fiction', 'kazuo ishiguro': 'Literary Fiction',
+      'haruki murakami': 'Literary Fiction', 'salman rushdie': 'Literary Fiction',
+      'vladimir nabokov': 'Literary Fiction', 'f. scott fitzgerald': 'Literary Fiction',
+      'ernest hemingway': 'Literary Fiction', 'john steinbeck': 'Literary Fiction',
+      'william faulkner': 'Literary Fiction', 'leo tolstoy': 'Literary Fiction',
+      'fyodor dostoevsky': 'Literary Fiction', 'james joyce': 'Literary Fiction',
+      'virginia woolf': 'Literary Fiction', 'franz kafka': 'Literary Fiction',
+      'gustave flaubert': 'Literary Fiction', 'victor hugo': 'Literary Fiction',
+      'charles dickens': 'Literary Fiction', 'jane austen': 'Literary Fiction',
+      'emily bronte': 'Literary Fiction', 'charlotte bronte': 'Literary Fiction',
+      'thomas hardy': 'Literary Fiction', 'd.h. lawrence': 'Literary Fiction',
+      'henry james': 'Literary Fiction', 'edith wharton': 'Literary Fiction',
+      'mark twain': 'Literary Fiction', 'nathaniel hawthorne': 'Literary Fiction',
+      'herman melville': 'Literary Fiction', 'joseph conrad': 'Literary Fiction',
+      'arundhati roy': 'Literary Fiction', 'vikram seth': 'Literary Fiction',
+      'yann martel': 'Literary Fiction', 'rohinton mistry': 'Literary Fiction',
+      'paulo coelho': 'Spirituality',
+      // Business
+      'peter drucker': 'Business', 'jim collins': 'Business', 'michael porter': 'Business',
+      'seth godin': 'Business', 'eric ries': 'Business', 'reid hoffman': 'Business',
+      'peter thiel': 'Business', 'sheryl sandberg': 'Business', 'ben horowitz': 'Business',
+      // Travel
+      'bill bryson': 'Travel', 'paul theroux': 'Travel', 'bruce chatwin': 'Travel',
+      // Poetry
+      'rumi': 'Poetry', 'pablo neruda': 'Poetry', 'emily dickinson': 'Poetry',
+      'walt whitman': 'Poetry', 't.s. eliot': 'Poetry', 'langston hughes': 'Poetry',
+      'maya angelou': 'Poetry', 'sylvia plath': 'Poetry', 'robert frost': 'Poetry',
+      'william shakespeare': 'Poetry', 'john keats': 'Poetry', 'william blake': 'Poetry',
+      'alfred lord tennyson': 'Poetry', 'william wordsworth': 'Poetry',
+      // Spirituality
+      'thich nhat hanh': 'Spirituality', 'dalai lama': 'Spirituality',
+      'thomas merton': 'Spirituality', 'deepak chopra': 'Spirituality',
+      'eckhart tolle': 'Spirituality', 'osho': 'Spirituality',
+    };
+
+    // ── Tier 3: Keyword-based category fallback ───────────────────────────────
+    const CATEGORY_MAP = [
+      { keys: ['philosoph', 'existential', 'ethics', 'ontolog', 'metaphysic'], genre: 'Philosophy' },
+      { keys: ['science fiction', 'sci-fi', 'scifi', 'dystop', 'cyberpunk', 'space opera'], genre: 'Science Fiction' },
+      { keys: ['fantasy', 'magic', 'fairy', 'wizard', 'dragon', 'epic fantasy'], genre: 'Fantasy' },
+      { keys: ['self-help', 'self help', 'motivat', 'productiv', 'habit', 'personal development', 'leadership'], genre: 'Self-Help' },
+      { keys: ['psycholog', 'mental', 'behaviour', 'behavior', 'cognit', 'neurosci'], genre: 'Psychology' },
+      { keys: ['histor', 'ancient', 'world war', 'civil war', 'colonial', 'medieval'], genre: 'History' },
+      { keys: ['science', 'biology', 'physics', 'chemist', 'astronom', 'evolution', 'natur', 'mathemat'], genre: 'Science' },
+      { keys: ['biograph', 'autobiograph', 'memoir', 'life of'], genre: 'Biography' },
+      { keys: ['romance', 'love story', 'chick lit', 'contemporary romance'], genre: 'Romance' },
+      { keys: ['mystery', 'thriller', 'detective', 'crime', 'suspense', 'noir'], genre: 'Mystery/Thriller' },
+      { keys: ['horror', 'ghost', 'dark fiction', 'supernatural thriller'], genre: 'Horror' },
+      { keys: ['business', 'entrepreneur', 'econom', 'financ', 'invest', 'manag', 'startup'], genre: 'Business' },
+      { keys: ['travel', 'adventure travel', 'journey', 'explor'], genre: 'Travel' },
+      { keys: ['poet', 'verse', 'haiku', 'lyric', 'anthology of poems'], genre: 'Poetry' },
+      { keys: ['spiritual', 'religion', 'faith', 'theolog', 'buddhis', 'christian', 'islam', 'wisdom', 'mystic'], genre: 'Spirituality' },
+      { keys: ['literary', 'fiction', 'novel', 'classic', 'contemporar'], genre: 'Literary Fiction' },
+    ];
+
+    const AUTHOR_GENRE_MAP_SIMPLE = {};
+    for (const [k, v] of Object.entries(AUTHOR_GENRE_MAP)) {
+      AUTHOR_GENRE_MAP_SIMPLE[k.replace(/[^a-z ]/g, '')] = v;
+    }
+
+    function mapCategory(raw, title, author) {
+      // Tier 1: exact title match
+      const tKey = (title || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+      if (TITLE_OVERRIDES[tKey]) return TITLE_OVERRIDES[tKey];
+
+      // Tier 2: author match
+      const aKey = (author || '').toLowerCase().trim();
+      if (AUTHOR_GENRE_MAP[aKey]) return AUTHOR_GENRE_MAP[aKey];
+
+      // Also try without middle initials / punctuation
+      const aKeySimple = aKey.replace(/[^a-z ]/g, '').trim();
+      if (AUTHOR_GENRE_MAP_SIMPLE[aKeySimple]) return AUTHOR_GENRE_MAP_SIMPLE[aKeySimple];
+
+      // Tier 3: keyword matching on raw CSV category
+      if (raw) {
+        const lower = raw.toLowerCase();
+        for (const entry of CATEGORY_MAP) {
+          if (entry.keys.some(k => lower.includes(k))) return entry.genre;
+        }
+      }
+
+      return 'Literary Fiction';
+    }
+
+    // ══════════════════════════════════════════════
+    // LOAD CATALOG FROM JSON
+    // ══════════════════════════════════════════════
+    let NLP_GRAPH = {};
+
+    async function loadCatalog() {
+      // First, check if backend is online
+      await checkBackend();
+
+      try {
+        // Always try to load the local merged.json for add-book search fallback.
+        // But don't block the app — init immediately, load in background.
+        document.getElementById('loading').style.display = 'none';
+        initApp();
+
+        // Load catalog JSON in the background for client-side search fallback
+        fetch('data/merged.json')
+          .then(r => r.ok ? r.json() : Promise.reject('merged.json not found'))
+          .then(rows => {
+            CATALOG = [];
+            for (let r = 0; r < rows.length; r++) {
+              const row = rows[r];
+              const title = (row[0] || '').trim();
+              if (!title) continue;
+              const author = (row[1] || '').trim().split(';')[0].trim() || 'Unknown';
+              const cat = (row[2] || '').trim();
+              const rating = row[3] || 3;
+              const thumb = (row[5] || '').trim();
+              CATALOG.push({ t: title, a: author, g: mapCategory(cat, title, author), r: rating, i: thumb });
+            }
+            const catalogInfo = backendOnline
+              ? `ML-powered search active · ${CATALOG.length.toLocaleString()} books in catalog`
+              : `Search our catalog of ${CATALOG.length.toLocaleString()}+ titles`;
+            document.getElementById('modal-sub-text').textContent = catalogInfo;
+            console.log(`✅ Local catalog loaded: ${CATALOG.length.toLocaleString()} books (fallback ready)`);
+          })
+          .catch(err => {
+            console.warn('Local catalog not loaded (backend search only):', err);
+            if (backendOnline) {
+              document.getElementById('modal-sub-text').textContent = 'ML-powered search — type to find any book';
+            }
+          });
+
+      } catch (error) {
+        console.error('Startup error:', error);
+        document.getElementById('loading').innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">⚠️</span>
+        <div class="empty-title">Failed to start BookSoul</div>
+        <div class="empty-sub">${error.message}</div>
+        <button class="btn btn-accent mt-20" onclick="location.reload()">Retry</button>
+      </div>`;
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    // [ALL YOUR EXISTING JAVASCRIPT - KEEPING SAME]
+    // ══════════════════════════════════════════════
+    let library = JSON.parse(localStorage.getItem('booksoul_v2') || '[]');
+    // Retrofit old libraries without status
+    library.forEach(b => { if (!b.status) b.status = 'read'; });
+
+    let currentRating = 0;
+    let selectedBook = null;
+    let acIndex = -1;
+    let radarChart = null, evoChart = null, genreChart = null;
+    let activeGenre = 'All';
+    let activeShelf = 'read';
+
+    function setShelf(s) {
+      activeShelf = s;
+      document.querySelectorAll('.shelf-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + s)?.classList.add('active');
+      renderLibrary();
+    }
+
+    const GENRE_COLORS = {
+      'Philosophy': '#7c3aed', 'Science Fiction': '#1d4ed8', 'Fantasy': '#059669',
+      'Self-Help': '#d97706', 'Psychology': '#db2777', 'History': '#b45309',
+      'Science': '#0891b2', 'Biography': '#65a30d', 'Romance': '#e11d48',
+      'Mystery/Thriller': '#6d28d9', 'Horror': '#dc2626', 'Literary Fiction': '#c026d3',
+      'Business': '#ea580c', 'Travel': '#0d9488', 'Poetry': '#be185d', 'Spirituality': '#4f46e5'
+    };
+
+    const SPINES = {
+      'Philosophy': '#7c3aed', 'Science Fiction': '#1d4ed8', 'Fantasy': '#059669',
+      'Self-Help': '#d97706', 'Psychology': '#db2777', 'History': '#b45309',
+      'Science': '#0891b2', 'Biography': '#65a30d', 'Romance': '#e11d48',
+      'Mystery/Thriller': '#6d28d9', 'Horror': '#dc2626', 'Literary Fiction': '#c026d3',
+      'Business': '#ea580c', 'Travel': '#0d9488', 'Poetry': '#be185d', 'Spirituality': '#4f46e5'
+    };
+
+    const THEME_MAP = {
+      'Philosophy': { O: .9, C: .3, E: .1, A: .3, N: .4 },
+      'Science Fiction': { O: .8, C: .2, E: .3, A: .2, N: .3 },
+      'Fantasy': { O: .7, C: .2, E: .4, A: .4, N: .2 },
+      'Self-Help': { O: .5, C: .9, E: .4, A: .5, N: .3 },
+      'Psychology': { O: .7, C: .5, E: .3, A: .5, N: .5 },
+      'History': { O: .6, C: .7, E: .2, A: .4, N: .2 },
+      'Science': { O: .8, C: .6, E: .2, A: .3, N: .2 },
+      'Biography': { O: .6, C: .5, E: .6, A: .5, N: .3 },
+      'Romance': { O: .4, C: .3, E: .7, A: .8, N: .4 },
+      'Mystery/Thriller': { O: .5, C: .5, E: .5, A: .3, N: .6 },
+      'Horror': { O: .4, C: .3, E: .4, A: .2, N: .8 },
+      'Literary Fiction': { O: .8, C: .4, E: .3, A: .5, N: .5 },
+      'Business': { O: .4, C: .9, E: .7, A: .4, N: .2 },
+      'Travel': { O: .7, C: .3, E: .8, A: .6, N: .2 },
+      'Poetry': { O: .9, C: .3, E: .2, A: .6, N: .5 },
+      'Spirituality': { O: .7, C: .4, E: .3, A: .7, N: .3 }
+    };
+
+    const TRAITS = {
+      O: { name: 'Openness', color: '#7c3aed', desc: 'Curiosity, imagination, love of ideas & art' },
+      C: { name: 'Conscientiousness', color: '#0891b2', desc: 'Discipline, organization, reliability' },
+      E: { name: 'Extraversion', color: '#059669', desc: 'Social energy, assertiveness, enthusiasm' },
+      A: { name: 'Agreeableness', color: '#db2777', desc: 'Empathy, warmth, cooperative spirit' },
+      N: { name: 'Neuroticism', color: '#d97706', desc: 'Emotional depth, sensitivity, introspection' }
+    };
+
+    const ARCHETYPES = [
+      { name: 'The Philosopher', emoji: '🦉', cond: s => s.O > .65, desc: 'A tireless seeker of truth and meaning', tags: ['Curious', 'Reflective', 'Intellectual'] },
+      { name: 'The Achiever', emoji: '🏆', cond: s => s.C > .7, desc: 'Driven, disciplined, and fiercely goal-oriented', tags: ['Focused', 'Reliable', 'Ambitious'] },
+      { name: 'The Empath', emoji: '💫', cond: s => s.A > .7, desc: 'A soul of deep warmth and emotional intelligence', tags: ['Compassionate', 'Warm', 'Generous'] },
+      { name: 'The Explorer', emoji: '🌍', cond: s => s.E > .65 && s.O > .5, desc: 'An adventurer of both places and ideas', tags: ['Bold', 'Curious', 'Energetic'] },
+      { name: 'The Dreamer', emoji: '🌙', cond: s => s.O > .6 && s.N > .5, desc: 'Creative, introspective, emotionally rich', tags: ['Imaginative', 'Sensitive', 'Artistic'] },
+      { name: 'The Analyst', emoji: '🔬', cond: s => s.C > .6 && s.O > .5, desc: 'Systematic thinker with insatiable curiosity', tags: ['Precise', 'Curious', 'Methodical'] },
+      { name: 'The Visionary', emoji: '🔭', cond: s => s.O > .7 && s.C > .5, desc: 'Big ideas married to the drive to realize them', tags: ['Creative', 'Strategic', 'Bold'] },
+      { name: 'The Storyteller', emoji: '📜', cond: s => s.A > .5 && s.O > .5, desc: 'Finds the human thread in every narrative', tags: ['Empathetic', 'Creative', 'Warm'] },
+      { name: 'The Scholar', emoji: '📚', cond: s => true, desc: 'A dedicated lover of the written word', tags: ['Thoughtful', 'Patient', 'Learned'] },
+    ];
+
+    function save() { localStorage.setItem('booksoul_v2', JSON.stringify(library)) }
+    function toast(msg, err = false) {
+      const t = document.getElementById('toast'); t.textContent = msg;
+      t.style.borderColor = err ? '#dc2626' : 'var(--gold)';
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2800);
+    }
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if (id === 'personality') renderPersonality();
+      if (id === 'recommendations') generateRecs();
+      if (id === 'evolution') renderEvolution();
+    }
+    function setRating(n) {
+      currentRating = n;
+      document.querySelectorAll('.star-btn').forEach((s, i) => s.classList.toggle('on', i < n));
+    }
+    function inferPersonality() {
+      if (!library.length) return null;
+      const acc = { O: 0, C: 0, E: 0, A: 0, N: 0 }; let tot = 0;
+      library.forEach(b => {
+        const m = THEME_MAP[b.g]; if (!m) return;
+        const w = (b.r / 5);
+        Object.keys(acc).forEach(k => { acc[k] += (m[k] || 0) * w }); tot += w;
+      });
+      if (!tot) return null;
+      const norm = {}; Object.keys(acc).forEach(k => { norm[k] = Math.min(1, acc[k] / tot) });
+      const uG = new Set(library.map(b => b.g)).size;
+      norm.O = Math.min(1, norm.O + (uG / 16) * .15);
+      return norm;
+    }
+    function topGenre() {
+      const c = {}; library.forEach(b => { c[b.g] = (c[b.g] || 0) + 1 });
+      return Object.entries(c).sort((a, b) => b[1] - a[1])[0]?.[0] || 'various';
+    }
+
+    function openModal() {
+      document.getElementById('modal').classList.add('open');
+      document.getElementById('modal-search').value = '';
+      document.getElementById('modal-dropdown').style.display = 'none';
+      document.getElementById('book-preview').classList.remove('show');
+      document.getElementById('modal-status').value = 'read';
+      document.getElementById('modal-rating-fields').style.display = 'block';
+      document.getElementById('modal-add-btn').style.display = 'none';
+      document.getElementById('modal-year').value = new Date().getFullYear();
+      selectedBook = null; currentRating = 0; acIndex = -1;
+      document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('on'));
+      setTimeout(() => document.getElementById('modal-search').focus(), 100);
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('open') }
+
+    let _searchTimer = null;
+    function handleModalSearch() {
+      const q = document.getElementById('modal-search').value.trim();
+      const dd = document.getElementById('modal-dropdown');
+      if (q.length < 2) { dd.style.display = 'none'; return; }
+
+      clearTimeout(_searchTimer);
+
+      if (backendOnline) {
+        // Debounced backend search
+        dd.innerHTML = '<div class="api-loading-inline"><div class="loading-spinner" style="width:18px;height:18px;border-width:2px"></div>Searching 100k books...</div>';
+        dd.style.display = 'block';
+        _searchTimer = setTimeout(() => _doBackendSearch(q), 250);
+      } else {
+        // Client-side fallback from local catalog
+        _doLocalSearch(q.toLowerCase());
+      }
+    }
+
+    async function _doBackendSearch(q) {
+      const dd = document.getElementById('modal-dropdown');
+      try {
+        const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error('Search failed');
+        const data = await res.json();
+        let raw = data.results || [];
+
+        if (!raw.length) {
+          dd.innerHTML = '<div style="padding:16px;font-family:var(--sans);font-size:13px;color:var(--ink4);text-align:center">No books found — try different keywords</div>';
+          dd.style.display = 'block';
+          return;
+        }
+
+        // Normalize raw CSV categories to our genre system & fix empty thumbnails
+        const qLow = q.toLowerCase();
+        const matches = raw.map(b => ({
+          ...b,
+          g: mapCategory(b.g, b.t, b.a),   // fix genre
+          i: (b.i && b.i !== 'nan') ? b.i : '' // clean thumbnail
+        }));
+
+        // Sort by relevance: exact title > starts-with > author match > rest
+        matches.sort((a, b) => {
+          const at = a.t.toLowerCase(), bt = b.t.toLowerCase();
+          const score = x => {
+            if (x === qLow) return 0;
+            if (x.startsWith(qLow)) return 1;
+            if (x.includes(qLow)) return 2;
+            return 3; // author match
+          };
+          return score(at) - score(bt);
+        });
+
+        acIndex = -1;
+        dd.innerHTML = matches.map((b, i) => _acItemHTML(b, i, qLow)).join('');
+        dd._matches = matches;
+        dd.style.display = 'block';
+      } catch (err) {
+        console.warn('Backend search failed, falling back to local:', err);
+        backendOnline = false;
+        checkBackend();
+        _doLocalSearch(q.toLowerCase());
+      }
+    }
+
+    function _doLocalSearch(q) {
+      const dd = document.getElementById('modal-dropdown');
+      if (!CATALOG.length) {
+        dd.innerHTML = '<div style="padding:16px;font-family:var(--sans);font-size:13px;color:var(--ink4);text-align:center">Catalog loading, please wait...</div>';
+        dd.style.display = 'block';
+        return;
+      }
+      const matches = CATALOG.filter(b =>
+        b.t.toLowerCase().includes(q) || b.a.toLowerCase().includes(q) || b.g.toLowerCase().includes(q)
+      ).slice(0, 8);
+      if (!matches.length) {
+        dd.innerHTML = '<div style="padding:16px;font-family:var(--sans);font-size:13px;color:var(--ink4);text-align:center">No books found</div>';
+        dd.style.display = 'block';
+        return;
+      }
+      acIndex = -1;
+      dd.innerHTML = matches.map((b, i) => _acItemHTML(b, i, q)).join('');
+      dd._matches = matches;
+      dd.style.display = 'block';
+    }
+
+    function _acItemHTML(b, i, q) {
+      const thumbHtml = b.i
+        ? `<img src="${b.i}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'ac-thumb-placeholder\'>📖</div>'">`
+        : `<div class="ac-thumb-placeholder" style="background:${SPINES[b.g] || '#888'};font-size:18px">📖</div>`;
+      return `
+    <div class="ac-item" data-idx="${i}" onmouseenter="acIndex=${i}" onclick="selectBook(${i})">
+      <div class="ac-thumb" style="${!b.i ? 'background:' + (SPINES[b.g] || '#888') : ''}">${thumbHtml}</div>
+      <div class="ac-info">
+        <div class="ac-title">${highlight(b.t, q)}</div>
+        <div class="ac-author">${b.a}</div>
+      </div>
+      <div class="ac-right">
+        <div class="ac-genre">${b.g}</div>
+        <div class="ac-rating">${'★'.repeat(Math.round(b.r || 0))} ${b.r}</div>
+      </div>
+    </div>`;
+    }
+
+    function highlight(str, q) {
+      const idx = str.toLowerCase().indexOf(q);
+      if (idx < 0) return str;
+      return str.slice(0, idx) + '<strong>' + str.slice(idx, idx + q.length) + '</strong>' + str.slice(idx + q.length);
+    }
+
+    function handleModalKey(e) {
+      const dd = document.getElementById('modal-dropdown');
+      const items = dd.querySelectorAll('.ac-item');
+      if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('selected', i === acIndex)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex - 1, 0); items.forEach((el, i) => el.classList.toggle('selected', i === acIndex)); }
+      else if (e.key === 'Enter' && acIndex >= 0) { selectBook(acIndex); }
+      else if (e.key === 'Escape') { closeModal(); }
+    }
+
+    function selectBook(idx) {
+      const dd = document.getElementById('modal-dropdown');
+      const matches = dd._matches;
+      if (!matches || !matches[idx]) return;
+      selectedBook = matches[idx];
+      document.getElementById('modal-search').value = selectedBook.t;
+      dd.style.display = 'none';
+      document.getElementById('preview-title').textContent = selectedBook.t;
+      document.getElementById('preview-author').textContent = selectedBook.a;
+      document.getElementById('preview-meta').textContent = selectedBook.g + ' · ★ ' + selectedBook.r;
+      document.getElementById('preview-spine').style.background = SPINES[selectedBook.g] || '#888';
+      document.getElementById('book-preview').classList.add('show');
+      document.getElementById('rating-section').style.display = 'block';
+      document.getElementById('modal-add-btn').style.display = 'inline-flex';
+    }
+
+    function confirmAdd() {
+      if (!selectedBook) { toast('Please select a book first', true); return }
+      const already = library.find(b => b.t === selectedBook.t);
+      if (already) { toast('Already in your library!', true); return }
+      library.unshift({
+        id: Date.now(), t: selectedBook.t, a: selectedBook.a,
+        g: selectedBook.g, r: currentRating || 3,
+        i: selectedBook.i || '',
+        status: document.getElementById('modal-status').value,
+        year: parseInt(document.getElementById('modal-year').value) || 2024,
+        added: new Date().toISOString()
+      });
+      save(); closeModal(); renderLibrary();
+      toast('📚 "' + selectedBook.t + '" added to your library!');
+      document.getElementById('lib-count').textContent = library.length;
+    }
+
+    function renderLibrary() {
+      const q = document.getElementById('search-bar-lib')?.value?.toLowerCase() || '';
+      const shelfBooks = library.filter(b => (b.status || 'read') === activeShelf);
+      const genres = ['All', ...new Set(shelfBooks.map(b => b.g))];
+      document.getElementById('genre-chips').innerHTML = genres.map(g => `<button class="chip${g === activeGenre ? ' active' : ''}" onclick="setGenre('${g}')">${g}</button>`).join('');
+      let books = shelfBooks.filter(b => (!q || (b.t + b.a).toLowerCase().includes(q)) && (activeGenre === 'All' || b.g === activeGenre));
+
+      const sortVal = document.getElementById('sort-lib')?.value || 'added-desc';
+      books.sort((a, b) => {
+        if (sortVal === 'added-desc') return new Date(b.added || 0) - new Date(a.added || 0);
+        if (sortVal === 'added-asc') return new Date(a.added || 0) - new Date(b.added || 0);
+        if (sortVal === 'rating-desc') return b.r - a.r;
+        if (sortVal === 'rating-asc') return a.r - b.r;
+        if (sortVal === 'title-asc') return a.t.localeCompare(b.t);
+        if (sortVal === 'author-asc') return a.a.localeCompare(b.a);
+        return 0;
+      });
+
+      const grid = document.getElementById('library-grid');
+      document.getElementById('lib-count').textContent = library.length;
+      if (!library.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">📚</span><div class="empty-title">Your shelf is empty</div><div class="empty-sub">Add your first book to begin your literary journey</div></div>`;
+      } else if (!books.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🔍</span><div class="empty-title">No matches found</div><div class="empty-sub">Try a different genre or clear the filter</div></div>`;
+      } else {
+        grid.innerHTML = books.map(b => {
+          const c = SPINES[b.g] || '#888';
+          const coverHtml = b.i
+            ? `<img src="${b.i}" alt="${b.t}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div class="book-cover-placeholder" style="background:${c};display:none">
+             <span class="ph-icon">📖</span>
+             <div class="ph-title">${b.t}</div>
+             <div class="ph-author">${b.a}</div>
+           </div>`
+            : `<div class="book-cover-placeholder" style="background:${c}">
+             <span class="ph-icon">📖</span>
+             <div class="ph-title">${b.t}</div>
+             <div class="ph-author">${b.a}</div>
+           </div>`;
+          return `
+      <div class="book-card" onclick="openDrawer(${b.id})" style="cursor:pointer">
+        <div class="book-cover" style="background:${c}">${coverHtml}</div>
+        <div class="book-body">
+          <div class="book-title">${b.t}</div>
+          <div class="book-author">${b.a}</div>
+          <div class="book-footer">
+            <span class="genre-pill" style="background:${hexA(GENRE_COLORS[b.g], .1)};color:${GENRE_COLORS[b.g]}">${b.g}</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="stars-display" style="${b.status === 'want' ? 'opacity:0.4' : ''}">${'★'.repeat(b.r)}${'☆'.repeat(5 - b.r)}</span>
+              <button onclick="event.stopPropagation(); removeBook(${b.id})" title="Remove" style="background:none;border:none;cursor:pointer;color:var(--ink4);font-size:14px;padding:2px 4px;border-radius:var(--r)">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+        }).join('');
+      }
+      const avg = library.length ? (library.reduce((s, b) => s + b.r, 0) / library.length).toFixed(1) : '-';
+      const uG = new Set(library.map(b => b.g)).size;
+      const thisYear = library.filter(b => b.year == new Date().getFullYear()).length;
+      document.getElementById('lib-metrics').innerHTML = `
+    <div class="metric-cell"><div class="metric-val">${library.length}</div><div class="metric-label">Books Read</div></div>
+    <div class="metric-cell"><div class="metric-val">${uG}</div><div class="metric-label">Genres</div></div>
+    <div class="metric-cell"><div class="metric-val">${avg}</div><div class="metric-label">Avg Rating</div></div>
+    <div class="metric-cell"><div class="metric-val">${thisYear}</div><div class="metric-label">This Year</div></div>`;
+    }
+    function setGenre(g) { activeGenre = g; renderLibrary() }
+    function removeBook(id) { library = library.filter(b => b.id !== id); save(); renderLibrary(); toast('Book removed') }
+    function hexA(hex, a) { const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r},${g},${b},${a})` }
+
+    function openDrawer(id) {
+      const b = library.find(x => x.id === id);
+      if (!b) return;
+      const c = SPINES[b.g] || '#888';
+      const coverHtml = b.i
+        ? `<img src="${b.i}" style="width:100%;height:auto;border-radius:var(--r2);box-shadow:4px 4px 12px rgba(0,0,0,0.1);display:block;margin-bottom:24px">`
+        : `<div style="width:100%;height:280px;background:${c};border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-size:24px;text-align:center;padding:20px;margin-bottom:24px;box-shadow:4px 4px 12px rgba(0,0,0,0.1)">${b.t}</div>`;
+
+      const statusLabels = { 'read': 'Read', 'reading': 'Currently Reading', 'want': 'Want to Read' };
+
+      document.getElementById('drawer-content').innerHTML = `
+    ${coverHtml}
+    <div style="font-family:var(--sans);font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:6px">${b.g} · Read in ${b.year || 'Unknown Year'}</div>
+    <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:8px">${b.t}</div>
+    <div style="font-family:var(--sans);font-size:16px;color:var(--ink3);margin-bottom:24px">${b.a}</div>
+    
+    <div style="display:flex;gap:12px;margin-bottom:32px">
+      <div style="background:var(--cream2);padding:12px 16px;border-radius:var(--r);flex:1">
+        <div style="font-family:var(--sans);font-size:11px;color:var(--ink4);text-transform:uppercase;margin-bottom:4px">Your Rating</div>
+        <div style="color:var(--gold);font-size:18px">${'★'.repeat(b.r)}${'☆'.repeat(5 - b.r)}</div>
+      </div>
+      <div style="background:var(--cream2);padding:12px 16px;border-radius:var(--r);flex:1">
+        <div style="font-family:var(--sans);font-size:11px;color:var(--ink4);text-transform:uppercase;margin-bottom:4px">Status</div>
+        <div style="font-family:var(--sans);font-size:14px;color:var(--ink);font-weight:500">${statusLabels[b.status || 'read']}</div>
+      </div>
+    </div>
+  `;
+      document.getElementById('drawer-bg').classList.add('open');
+    }
+
+    function closeDrawer(e) {
+      if (e && e.target !== document.getElementById('drawer-bg')) return;
+      document.getElementById('drawer-bg').classList.remove('open');
+    }
+
+    function renderPersonality() {
+      const s = inferPersonality();
+      if (!s || library.length < 3) {
+        document.getElementById('p-empty').style.display = 'block';
+        document.getElementById('p-content').style.display = 'none'; return;
+      }
+      document.getElementById('p-empty').style.display = 'none';
+      document.getElementById('p-content').style.display = 'block';
+      const arch = ARCHETYPES.find(a => a.cond(s)) || ARCHETYPES[ARCHETYPES.length - 1];
+      document.getElementById('archetype-banner').innerHTML = `
+    <div style="font-size:52px;line-height:1">${arch.emoji}</div>
+    <div style="flex:1">
+      <div style="font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:4px">You Are</div>
+      <div class="archetype-name">${arch.name}</div>
+      <div class="archetype-desc">${arch.desc}</div>
+      <div class="archetype-traits">${arch.tags.map(t => `<span class="archetype-trait-tag">${t}</span>`).join('')}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--sans);font-size:11px;color:var(--cream4);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Based on</div>
+      <div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--gold2)">${library.length}</div>
+      <div style="font-family:var(--sans);font-size:11px;color:var(--cream4)">books read</div>
+    </div>`;
+      const traitList = [{ k: 'O', v: s.O }, { k: 'C', v: s.C }, { k: 'E', v: s.E }, { k: 'A', v: s.A }, { k: 'N', v: s.N }];
+      document.getElementById('trait-bars').innerHTML = traitList.map(({ k, v }) => {
+        const m = TRAITS[k], p = Math.round(v * 100);
+        return `<div class="trait-item">
+      <div class="trait-head"><span class="trait-name">${m.name}</span><span class="trait-pct">${p}%</span></div>
+      <div class="trait-bar-bg"><div class="trait-bar-fill" style="width:${p}%;background:${m.color}"></div></div>
+      <div class="trait-desc">${m.desc}</div>
+    </div>`;
+      }).join('');
+      if (radarChart) { radarChart.destroy(); radarChart = null }
+      radarChart = new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+          labels: ['Openness', 'Conscientious', 'Extraversion', 'Agreeableness', 'Neuroticism'],
+          datasets: [{
+            data: [s.O, s.C, s.E, s.A, s.N].map(v => Math.round(v * 100)),
+            backgroundColor: 'rgba(139,58,15,0.1)', borderColor: '#8b3a0f', borderWidth: 2,
+            pointBackgroundColor: '#8b3a0f', pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: {
+            r: {
+              min: 0, max: 100, grid: { color: 'rgba(0,0,0,0.08)' }, angleLines: { color: 'rgba(0,0,0,0.08)' },
+              ticks: { display: false }, pointLabels: { color: '#6b5744', font: { size: 11, family: 'DM Sans' } }
+            }
+          }
+        }
+      });
+      const top = traitList.sort((a, b) => b.v - a.v)[0];
+      const uG = new Set(library.map(b => b.g)).size;
+      const best = library.slice().sort((a, b) => b.r - a.r)[0];
+      document.getElementById('p-insights').innerHTML = [
+        `${arch.emoji} Our editorial assessment: You are <strong>${arch.name}</strong>. ${arch.desc}. Your reading choices reveal a mind that seeks <strong>${TRAITS[top.k].name.toLowerCase()}</strong> above all else.`,
+        `You've explored <strong>${uG} distinct literary genres</strong>, giving you a reading breadth index of <strong>${Math.round(uG / 16 * 100)}%</strong>. ${uG > 8 ? 'A remarkably wide palate.' : uG > 4 ? 'A solid and growing range.' : 'Try branching into new genres to deepen your profile.'}`,
+        `Your highest-rated book — <em>${best.t}</em> by ${best.a} — reflects the depth of your engagement with <strong>${best.g}</strong> literature.`,
+      ].map(i => `<div class="insight-box">${i}</div>`).join('');
+    }
+
+    function rcHTML(b, reason) {
+      const c = SPINES[b.g] || SPINES[b.genre] || '#888';
+      const genre = b.g || b.genre || 'Fiction';
+      const title = b.t || b.title || '';
+      const author = b.a || b.author || '';
+      const rating = b.r ?? b.rating ?? 0;
+      const thumb = b.i || b.thumbnail || '';
+      const coverHtml = thumb
+        ? `<img src="${thumb}" alt="${title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+         <div class="rec-card-cover-placeholder" style="background:${c};display:none">
+           <div class="ph-title">${title}</div>
+         </div>`
+        : `<div class="rec-card-cover-placeholder" style="background:${c}">
+           <span style="font-size:24px">📖</span>
+           <div class="ph-title">${title}</div>
+         </div>`;
+      const scoreTag = b.score ? `<span style="font-family:var(--sans);font-size:10px;background:rgba(139,58,15,.1);color:var(--accent);padding:2px 6px;border-radius:3px;margin-left:4px">⚡ ${b.score}% match</span>` : '';
+      return `<div class="rec-card">
+      <div class="rec-card-cover" style="background:${c}">${coverHtml}</div>
+      <div class="rec-card-body">
+        <div class="rec-card-title">${title}${scoreTag}</div>
+        <div class="rec-card-author">${author}</div>
+        <div class="rec-card-reason">${reason}</div>
+        <div class="rec-card-footer">
+          <span class="genre-pill" style="background:${hexA(GENRE_COLORS[genre] || '#888', .1)};color:${GENRE_COLORS[genre] || '#888'};font-size:11px;padding:3px 8px;border-radius:2px">${genre}</span>
+          <span style="font-size:12px;color:var(--gold)">★ ${rating}</span>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    async function generateRecs() {
+      const empty = document.getElementById('rec-empty');
+      const content = document.getElementById('rec-content');
+      if (library.length < 2) { empty.style.display = 'block'; content.innerHTML = ''; return; }
+      empty.style.display = 'none';
+
+      if (backendOnline) {
+        await _generateRecsFromBackend(content);
+      } else {
+        _generateRecsClientSide(content);
+      }
+    }
+
+    async function _generateRecsFromBackend(content) {
+      const s = inferPersonality();
+      const arch = s ? (ARCHETYPES.find(a => a.cond(s)) || ARCHETYPES[ARCHETYPES.length - 1]) : null;
+      const topTName = s ? TRAITS[Object.entries(s).sort((a, b) => b[1] - a[1])[0][0]].name : '';
+
+      // Show loading state
+      content.innerHTML = `<div style="padding:40px;text-align:center">
+        <div class="loading-spinner" style="margin:0 auto 16px;width:36px;height:36px"></div>
+        <div style="font-family:var(--sans);font-size:14px;color:var(--ink3)">Our ML engine is finding your perfect reads…</div>
+      </div>`;
+
+      try {
+        // Prefer highly-rated books from the library as seeds
+        const seeds = library
+          .filter(b => (b.status || 'read') === 'read')
+          .sort((a, b) => b.r - a.r)
+          .slice(0, 10)
+          .map(b => b.t);
+
+        const res = await fetch(`${API_BASE}/api/recommend`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ liked_titles: seeds })
+        });
+
+        if (!res.ok) throw new Error('Recommend API error: ' + res.status);
+        const data = await res.json();
+        const recs = data.recommendations || [];
+
+        if (!recs.length) {
+          // Backend returned nothing — show helpful message, don't fall back silently
+          content.innerHTML = `<div class="empty-state">
+            <span class="empty-icon">🔍</span>
+            <div class="empty-title">Couldn't match your books to the ML catalog</div>
+            <div class="empty-sub" style="max-width:380px;margin:0 auto">Your current books may have slightly different titles in our 100k dataset. Try adding more books from the search catalog, then refresh.</div>
+          </div>`;
+          return;
+        }
+
+        let html = '';
+        if (arch) {
+          html += `<div class="rec-section-title">🤖 Semantic Plot Match <span>Powered by 100k-book ML Engine</span></div>`;
+          if (s) {
+            html += `<div style="font-family:var(--sans);font-size:12px;color:var(--ink4);margin-bottom:16px;padding:10px 14px;background:var(--cream2);border-radius:var(--r);border-left:3px solid var(--accent)">`;
+            html += `${arch.emoji} Recommendations tailored for <strong>${arch.name}</strong> — matched by your top trait: <strong>${topTName}</strong>`;
+            html += `</div>`;
+          }
+        }
+        html += `<div class="rec-grid">`;
+        html += recs.map(b => rcHTML(b, `Semantically matched to your reading taste — ${b.score}% plot similarity`)).join('');
+        html += `</div>`;
+        content.innerHTML = html;
+
+      } catch (err) {
+        console.warn('Backend recommend failed:', err.message);
+        backendOnline = false;
+        await checkBackend();
+        _generateRecsClientSide(content);
+      }
+    }
+
+    function _generateRecsClientSide(content) {
+      const s = inferPersonality();
+      const read = new Set(library.map(b => b.t.toLowerCase()));
+      const gScore = {}; const aScore = {};
+      library.forEach(b => {
+        const w = b.r / 5;
+        gScore[b.g] = (gScore[b.g] || 0) + w;
+        aScore[b.a] = (aScore[b.a] || 0) + w;
+      });
+
+      if (!CATALOG._sorted) { CATALOG.sort((a, b) => b.r - a.r); CATALOG._sorted = true; }
+
+      let tGs = [];
+      if (s) {
+        const topK = Object.entries(s).sort((a, b) => b[1] - a[1])[0][0];
+        const tMap = { O: ['Philosophy', 'Literary Fiction', 'Poetry', 'Science'], C: ['Self-Help', 'Business', 'History'], E: ['Travel', 'Biography', 'Romance'], A: ['Romance', 'Spirituality', 'Biography'], N: ['Horror', 'Mystery/Thriller', 'Literary Fiction'] };
+        tGs = tMap[topK] || [];
+      }
+
+      const rG = new Set(library.map(b => b.g));
+      const topGenres = Object.entries(gScore).sort((x, y) => y[1] - x[1]).slice(0, 3).map(x => x[0]);
+      const topAuthors = Object.entries(aScore).sort((x, y) => y[1] - x[1]).slice(0, 3).map(x => x[0]);
+      const authorRecs = [], contentRecs = [], personalityRecs = [], diversityRecs = [];
+      const usedTitles = new Set(read);
+
+      for (let i = 0; i < CATALOG.length; i++) {
+        const b = CATALOG[i];
+        const tLower = b.t.toLowerCase();
+        if (usedTitles.has(tLower)) continue;
+        if (authorRecs.length < 4 && topAuthors.includes(b.a)) { authorRecs.push(b); usedTitles.add(tLower); }
+        else if (contentRecs.length < 6 && topGenres.includes(b.g)) { contentRecs.push(b); usedTitles.add(tLower); }
+        else if (personalityRecs.length < 5 && tGs.includes(b.g)) { personalityRecs.push(b); usedTitles.add(tLower); }
+        else if (diversityRecs.length < 4 && !rG.has(b.g)) { diversityRecs.push(b); usedTitles.add(tLower); }
+        if (authorRecs.length >= 4 && contentRecs.length >= 6 && personalityRecs.length >= 5 && diversityRecs.length >= 4) break;
+      }
+
+      const arch = s ? (ARCHETYPES.find(a => a.cond(s)) || ARCHETYPES[ARCHETYPES.length - 1]) : null;
+      const topTName = s ? TRAITS[Object.entries(s).sort((a, b) => b[1] - a[1])[0][0]].name : '';
+      let html = '';
+      if (authorRecs.length) {
+        html += `<div class="rec-section-title">Because you loved these authors <span>Author Match</span></div><div class="rec-grid">`;
+        html += authorRecs.map(b => rcHTML(b, `Based on your high ratings for ${b.a}`)).join('');
+        html += `</div>`;
+      }
+      if (contentRecs.length) {
+        html += `<div class="rec-section-title">Based on your taste <span>Content Match</span></div><div class="rec-grid">`;
+        html += contentRecs.map(b => rcHTML(b, `You've highly rated books in ${b.g} — this is a natural next step`)).join('');
+        html += `</div>`;
+      }
+      if (personalityRecs.length && arch) {
+        html += `<div class="rec-section-title">${arch.emoji} ${arch.name}'s picks <span>Personality Match</span></div><div class="rec-grid">`;
+        html += personalityRecs.map(b => rcHTML(b, `Curated for your dominant ${topTName} trait — readers like you love this`)).join('');
+        html += `</div>`;
+      }
+      if (diversityRecs.length) {
+        html += `<div class="rec-section-title">Expand your horizons <span>New Territory</span></div><div class="rec-grid">`;
+        html += diversityRecs.map(b => rcHTML(b, `An unexplored genre for you — broaden your literary world`)).join('');
+        html += `</div>`;
+      }
+      if (!html && !CATALOG.length) {
+        html = `<div class="empty-state"><span class="empty-icon">⚡</span><div class="empty-title">Start the ML Engine for recommendations</div><div class="empty-sub">Run <code>python backend/main.py</code> to enable semantic AI recommendations</div></div>`;
+      }
+      content.innerHTML = html || `<div class="empty-state"><span class="empty-icon">🎉</span><div class="empty-title">You've conquered the catalog!</div></div>`;
+    }
+
+    function renderEvolution() {
+      const empty = document.getElementById('evo-empty');
+      const content = document.getElementById('evo-content');
+      if (library.length < 2) { empty.style.display = 'block'; content.style.display = 'none'; return }
+      empty.style.display = 'none'; content.style.display = 'block';
+      const years = [...new Set(library.map(b => b.year))].sort();
+      const snaps = years.map(y => {
+        const sub = library.filter(b => b.year <= y);
+        const acc = { O: 0, C: 0, E: 0, A: 0, N: 0 }; let tot = 0;
+        sub.forEach(b => { const m = THEME_MAP[b.g]; if (!m) return; const w = b.r / 5; Object.keys(acc).forEach(k => { acc[k] += (m[k] || 0) * w }); tot += w; });
+        const n = {}; if (tot) Object.keys(acc).forEach(k => { n[k] = Math.min(1, acc[k] / tot) }); else Object.keys(acc).forEach(k => { n[k] = 0 });
+        return { year: y, ...n };
+      });
+      const tC = { O: '#7c3aed', C: '#0891b2', E: '#059669', A: '#db2777', N: '#d97706' };
+      const tN = { O: 'Openness', C: 'Conscientiousness', E: 'Extraversion', A: 'Agreeableness', N: 'Neuroticism' };
+      if (evoChart) { evoChart.destroy(); evoChart = null }
+      evoChart = new Chart(document.getElementById('evoChart'), {
+        type: 'line',
+        data: {
+          labels: snaps.map(s => s.year), datasets: Object.keys(tC).map(k => ({
+            label: tN[k], data: snaps.map(s => Math.round((s[k] || 0) * 100)),
+            borderColor: tC[k], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 4, tension: .4
+          }))
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#9c8472', font: { family: 'DM Sans', size: 12 } } },
+            y: { min: 0, max: 100, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#9c8472', font: { family: 'DM Sans', size: 12 }, callback: v => v + '%' } }
+          }
+        }
+      });
+      document.getElementById('evo-legend').innerHTML = Object.entries(tN).map(([k, n]) => `<span style="display:flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12px;color:var(--ink3)"><span style="width:14px;height:3px;border-radius:2px;background:${tC[k]};display:inline-block"></span>${n}</span>`).join('');
+      const avg = (library.reduce((s, b) => s + b.r, 0) / library.length).toFixed(1);
+      const best = library.slice().sort((a, b) => b.r - a.r)[0];
+      document.getElementById('evo-stats').innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream3)"><span style="font-family:var(--sans);font-size:13px;color:var(--ink3)">Total books</span><strong style="font-family:var(--serif)">${library.length}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream3)"><span style="font-family:var(--sans);font-size:13px;color:var(--ink3)">Average rating</span><strong style="color:var(--gold)">${avg} ★</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream3)"><span style="font-family:var(--sans);font-size:13px;color:var(--ink3)">Favourite genre</span><strong style="font-family:var(--serif);color:var(--accent)">${topGenre()}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream3)"><span style="font-family:var(--sans);font-size:13px;color:var(--ink3)">Years tracked</span><strong>${years.length}</strong></div>
+    <div style="margin-top:16px;padding:14px;background:var(--cream2);border-radius:var(--r2);border-left:4px solid var(--gold)">
+      <div style="font-family:var(--sans);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink4);margin-bottom:6px">Best rated book</div>
+      <div style="font-family:var(--serif);font-size:15px;font-weight:700">${best.t}</div>
+      <div style="font-family:var(--sans);font-size:12px;color:var(--ink3);margin-top:2px">${best.a} · ${'★'.repeat(best.r)}</div>
+    </div>`;
+      const gC = {}; library.forEach(b => { gC[b.g] = (gC[b.g] || 0) + 1 });
+      const gL = Object.keys(gC), gD = Object.values(gC), gCol = gL.map(g => GENRE_COLORS[g] || '#888');
+      if (genreChart) { genreChart.destroy(); genreChart = null }
+      genreChart = new Chart(document.getElementById('genreChart'), {
+        type: 'doughnut',
+        data: { labels: gL, datasets: [{ data: gD, backgroundColor: gCol, borderColor: '#faf6ef', borderWidth: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '62%' }
+      });
+      document.getElementById('genre-legend').innerHTML = gL.map((g, i) => `<span style="display:flex;align-items:center;gap:4px;font-family:var(--sans);font-size:11px;color:var(--ink3)"><span style="width:8px;height:8px;border-radius:50%;background:${gCol[i]};flex-shrink:0"></span>${g}</span>`).join('');
+    }
+
+    function initApp() {
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.addEventListener('click', e => {
+        if (!e.target.closest('#modal')) return;
+        if (!e.target.closest('#modal-search') && !e.target.closest('#modal-dropdown'))
+          document.getElementById('modal-dropdown').style.display = 'none';
+      });
+
+      // Seed with sample data if library is empty
+      if (!library.length) {
+        library = [
+          { id: 1, t: 'Sapiens', a: 'Yuval Noah Harari', g: 'History', r: 5, year: 2023, added: '2023-01-01T00:00:00.000Z' },
+          { id: 2, t: 'Dune', a: 'Frank Herbert', g: 'Science Fiction', r: 4, year: 2023, added: '2023-06-01T00:00:00.000Z' },
+          { id: 3, t: 'Meditations', a: 'Marcus Aurelius', g: 'Philosophy', r: 5, year: 2024, added: '2024-01-01T00:00:00.000Z' },
+          { id: 4, t: 'Atomic Habits', a: 'James Clear', g: 'Self-Help', r: 4, year: 2024, added: '2024-03-01T00:00:00.000Z' },
+          { id: 5, t: 'Thinking, Fast and Slow', a: 'Daniel Kahneman', g: 'Psychology', r: 4, year: 2024, added: '2024-07-01T00:00:00.000Z' },
+        ];
+        save();
+      }
+
+      renderLibrary();
+    }
+
+    // Load catalog on page load
+    loadCatalog();
+  </script>
+</body>
+
+</html>
