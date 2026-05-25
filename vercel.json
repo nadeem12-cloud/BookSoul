@@ -1,5 +1,14 @@
 {
+    "version": 2,
     "builds": [
+        {
+            "src": "BookSoul.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "*.js",
+            "use": "@vercel/static"
+        },
         {
             "src": "backend/main.py",
             "use": "@vercel/python"
@@ -7,8 +16,12 @@
     ],
     "routes": [
         {
-            "src": "/(.*)",
+            "src": "/backend/(.*)",
             "dest": "backend/main.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
         }
     ]
 }
