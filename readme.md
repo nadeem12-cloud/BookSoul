@@ -370,4 +370,4 @@ Give a ⭐️ if you find this project interesting!
 
 ---
 
-**Built with ❤️ | 2024**
+**Built with ❤️ | 2026**
