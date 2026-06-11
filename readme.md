@@ -54,6 +54,29 @@ BookSoul analyzes your reading history to:
 
 ---
 
+## 📸 Screenshots
+
+### Library View - Your Reading Collection
+![Library View](assets/ss1.png)
+
+### Personality Profile - Your Literary Identity
+![Personality Analysis](assets/ss2.png)
+
+### Recommendations - AI-Powered Suggestions
+![Book Recommendations](assets/ss3.png)
+
+### Evolution Tracking - Your Reading Journey
+![Reading Evolution](assets/ss4.png)
+
+### Additional Features
+![Feature View 5](assets/ss5.png)
+
+![Feature View 6](assets/ss6.png)
+
+![Feature View 7](assets/ss7.png)
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -215,6 +238,9 @@ BookSoul/
 │
 ├── scripts/
 │   └── optimize_catalog.py     # Data optimization
+│
+├── assets/
+│   └── ss1.png to ss7.png      # Screenshots
 │
 ├── .gitignore
 ├── README.md
