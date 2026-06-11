@@ -334,7 +334,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 - GitHub: [@nadeem12-cloud](https://github.com/nadeem12-cloud)
 - LinkedIn: [Nadeem Memon](https://linkedin.com/in/nadeem-memon)
-- Portfolio: [nadeemmemon.pythonanywhere.com](https://nadeemmemon.pythonanywhere.com)
+- Portfolio: [nadeemmemon.pythonanywhere.com](https://portfolio-ruby-three-m2keql87xs.vercel.app/)
 
 ---
 
