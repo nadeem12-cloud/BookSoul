@@ -22,7 +22,7 @@ backend/data/final_book_dataset_kaggle2.csv
 backend/data/merged.csv
 backend/data/merged.json
 backend/data/books.csv
-
+node_modules/
 # Model cache - rebuild on server
 backend/cache/*.pkl
 *.pkl
@@ -34,5 +34,8 @@ backend/cache/*.pkl
 # EXCEPTION: Keep optimized frontend catalog
 !frontend/data/
 !frontend/data/merged.json  # <-- This ONE is OK (will be optimized to 3MB)
+<<<<<<< HEAD
 
 node_modules/
+=======
+>>>>>>> 2da252e14d74e8a71d3a92170730f747a7fb74bd
