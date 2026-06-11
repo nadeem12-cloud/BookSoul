@@ -22,7 +22,7 @@ backend/data/final_book_dataset_kaggle2.csv
 backend/data/merged.csv
 backend/data/merged.json
 backend/data/books.csv
-
+node_modules/
 # Model cache - rebuild on server
 backend/cache/*.pkl
 *.pkl
