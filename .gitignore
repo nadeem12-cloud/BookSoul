@@ -34,3 +34,5 @@ backend/cache/*.pkl
 # EXCEPTION: Keep optimized frontend catalog
 !frontend/data/
 !frontend/data/merged.json  # <-- This ONE is OK (will be optimized to 3MB)
+
+node_modules/
